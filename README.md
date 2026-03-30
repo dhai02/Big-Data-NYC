@@ -134,6 +134,21 @@ docker exec spark python src/05_verify_results.py      # verify
 
 ---
 
+## TV2 deliverables (assignment alignment)
+
+Use notebooks for direct demonstration:
+
+- `notebooks/02_cleaning_demo.ipynb`
+- `notebooks/03_aggregation_viz.ipynb`
+
+Supporting docs and tests:
+
+- `docs/tv2_feature_docs.md`
+- `docs/tv2_before_after_report.md`
+- `tests/test_cleaning_utils.py`
+
+---
+
 ## Manual setup (WSL2, without Docker)
 
 <details>

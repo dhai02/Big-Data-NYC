@@ -53,6 +53,8 @@ services:
       - ./src:/app/src
       - ./notebooks:/app/notebooks
       - ./data:/app/data
+      - ./tests:/app/tests
+      - ./docs:/app/docs
     ports:
       - "8888:8888"
       - "4040:4040"
