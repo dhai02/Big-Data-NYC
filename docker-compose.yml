@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+
+  # ── HDFS NameNode ─────────────────────────────────────────
+  namenode:
+    image: apache/hadoop:3.3.6
+    container_name: namenode
+    hostname: namenode
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - CLUSTER_NAME=nyc-taxi-cluster
+    env_file: ./docker/hadoop.env
+    command: ["hdfs", "namenode"]
+    ports:
+      - "9870:9870"   # Web UI
+      - "9000:9000"   # HDFS RPC
+    volumes:
+      - namenode_data:/tmp/hadoop-root/dfs/name
+    networks:
+      - hadoop-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9870"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ── HDFS DataNode ─────────────────────────────────────────
+  datanode:
+    image: apache/hadoop:3.3.6
+    container_name: datanode
+    hostname: datanode
+    env_file: ./docker/hadoop.env
+    command: ["hdfs", "datanode"]
+    ports:
+      - "9864:9864"   # DataNode Web UI
+    volumes:
+      - datanode_data:/tmp/hadoop-root/dfs/data
+    networks:
+      - hadoop-net
+    depends_on:
+      namenode:
+        condition: service_healthy
+
+  # ── PySpark + pipeline ────────────────────────────────────
+  spark:
+    build: ./docker
+    container_name: spark
+    environment:
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+      - HDFS_NAMENODE=namenode
+    volumes:
+      - ./src:/app/src                  # code
+      - ./notebooks:/app/notebooks      # notebooks
+      - ./data:/app/data                # local data cache
+    ports:
+      - "8888:8888"   # Jupyter
+      - "4040:4040"   # Spark UI
+    networks:
+      - hadoop-net
+    depends_on:
+      namenode:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
+volumes:
+  namenode_data:
+  datanode_data:
+
+networks:
+  hadoop-net:
+    driver: bridge
