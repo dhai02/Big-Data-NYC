@@ -11,7 +11,7 @@ ENV HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
 ENV PYSPARK_PYTHON=python3
 
 # Copy Hadoop config template
-COPY hadoop-client.xml /opt/hadoop/etc/hadoop/core-site.xml
+COPY docker/hadoop-client.xml /opt/hadoop/etc/hadoop/core-site.xml
 
 WORKDIR /app
 
